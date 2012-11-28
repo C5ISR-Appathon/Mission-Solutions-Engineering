@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, MapFragmentExampleActivity!</string>
+    <string name="app_name">MapFragmentExample</string>
+    <string name="debug_googlemaps_sdk_key">0zSsVoD5-q_qoGO3CmJou3R4riJGXEv4v-vmVyQ</string>
+    <string name="deployed_googlemaps_sdk_key">08BejwWoGeB9a5VhypQ7mnlgcl9PaOq8Kgi86eA</string>
+
+    <item name="googlemaps_sdk_key" type="string">@string/debug_googlemaps_sdk_key</item>
+
+    <string name="show_video">Show Video</string>
+    <string name="show_stores">Show Stores</string>
+
+</resources>

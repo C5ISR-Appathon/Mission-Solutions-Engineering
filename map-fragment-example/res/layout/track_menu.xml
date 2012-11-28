@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/video"
+          android:title="@string/show_video"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/stores"
+          android:title="@string/show_stores" />
+</menu>
