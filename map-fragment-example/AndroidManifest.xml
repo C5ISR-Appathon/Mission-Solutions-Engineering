@@ -34,6 +34,9 @@
         <activity
             android:name=".AndroidListMediaActivity"></activity>
             
+       <activity
+            android:name=".MainActivity"></activity>
+            
     </application>
-
+    
 </manifest>

@@ -217,6 +217,10 @@ OnNdefPushCompleteCallback {
 	public void showStores(long id)
 	{
 		System.out.println("showStores:  Value of trackId == " + id);
+		Intent intent = new Intent(MyMapActivity.this, MainActivity.class);
+        startActivity(intent);
+        
+
 	}
 	public void showVideo(long id)
 	{
@@ -224,12 +228,7 @@ OnNdefPushCompleteCallback {
 
 		Intent intent = new Intent(MyMapActivity.this, AndroidListMediaActivity.class);
         startActivity(intent);
-        /*
-		Intent intent = new Intent(Intent.ACTION_VIEW)
-		.setType("application/com.missionse.example")
-		.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-*/
+        
 	}
 
 }
