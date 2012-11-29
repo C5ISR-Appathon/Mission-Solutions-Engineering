@@ -4,10 +4,12 @@ package com.missionse.example;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -41,7 +43,7 @@ OnNdefPushCompleteCallback {
 	private static final int MESSAGE_SENT = 1;
 	public static final String TAG = "AssetOnDemand";
 	private MapView mMapView;
-	
+
 	private GeoUpdateHandler locationListener =  new GeoUpdateHandler();
 	private MapController mapController = null;
 
@@ -49,6 +51,9 @@ OnNdefPushCompleteCallback {
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		setContentView(R.layout.my_map_activity);
+
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 		// Check for available NFC Adapter
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -66,10 +71,7 @@ OnNdefPushCompleteCallback {
 		MapController mapController = mMapView.getController();
 		mapController.setZoom(7); // Zoom 1 is world view
 		mapController.setCenter(new GeoPoint(32240000,-80120000));
-		/*
-         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-		 */
+
 	}
 
 	@Override
@@ -94,7 +96,7 @@ OnNdefPushCompleteCallback {
 						payload.getBytes()),
 						NdefRecord.createApplicationRecord("com.missionse.example")
 		});
-		
+
 		return nfcMessage;
 	}
 
@@ -109,23 +111,23 @@ OnNdefPushCompleteCallback {
 	private void displayAssets() {
 
 		List<Overlay> mapOverlays = mMapView.getOverlays();
-        Drawable drawable = this.getResources().getDrawable(R.drawable.helicopter_small);
-        MyItemizedOverlay itemizedoverlay = new MyItemizedOverlay(drawable, this, 1);
+		Drawable drawable = this.getResources().getDrawable(R.drawable.helicopter_small);
+		MyItemizedOverlay itemizedoverlay = new MyItemizedOverlay(drawable, this, 1);
 
-        GeoPoint point = new GeoPoint(32240000,-80120000);
-        OverlayItem overlayitem = new OverlayItem(point, "Track 1", "Show Video");
+		GeoPoint point = new GeoPoint(32240000,-80120000);
+		OverlayItem overlayitem = new OverlayItem(point, "Track 1", "Show Video");
 
-        itemizedoverlay.addOverlayItem(overlayitem);
-        mapOverlays.add(itemizedoverlay);
+		itemizedoverlay.addOverlayItem(overlayitem);
+		mapOverlays.add(itemizedoverlay);
 
-        Drawable drawable2 = this.getResources().getDrawable(R.drawable.tracked_vehicle_small);
-        MyItemizedOverlay itemizedoverlay2 = new MyItemizedOverlay(drawable2, this, 2);
+		Drawable drawable2 = this.getResources().getDrawable(R.drawable.tracked_vehicle_small);
+		MyItemizedOverlay itemizedoverlay2 = new MyItemizedOverlay(drawable2, this, 2);
 
-        GeoPoint point2 = new GeoPoint(40240000,-75120000);
-        OverlayItem overlayitem2 = new OverlayItem(point2, "Track 2", "Show Video");
+		GeoPoint point2 = new GeoPoint(40240000,-75120000);
+		OverlayItem overlayitem2 = new OverlayItem(point2, "Track 2", "Show Video");
 
-        itemizedoverlay2.addOverlayItem(overlayitem2);
-        mapOverlays.add(itemizedoverlay2);
+		itemizedoverlay2.addOverlayItem(overlayitem2);
+		mapOverlays.add(itemizedoverlay2);
 	}
 
 	private final Handler mHandler = new Handler() {
@@ -161,64 +163,73 @@ OnNdefPushCompleteCallback {
 
 		NdefMessage msg = (NdefMessage) rawMsgs[0];
 	}
-	
-    public class GeoUpdateHandler implements LocationListener {
-        @Override
-        public void onLocationChanged(Location location) {
-        	System.out.println("Received new location: Lat: " + location.getLatitude() 
-        						+ " Lon: " + location.getLongitude());
-            mapController.animateTo( GeopointFactory(location.getLatitude(), location.getLongitude()));
-        }
 
-        @Override
-        public void onProviderDisabled(String provider) {
-        }
+	public class GeoUpdateHandler implements LocationListener {
+		@Override
+		public void onLocationChanged(Location location) {
+			System.out.println("Received new location: Lat: " + location.getLatitude() 
+					+ " Lon: " + location.getLongitude());
+			mapController.animateTo( GeopointFactory(location.getLatitude(), location.getLongitude()));
+		}
 
-        @Override
-        public void onProviderEnabled(String provider) {
-        }
+		@Override
+		public void onProviderDisabled(String provider) {
+		}
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-    }
+		@Override
+		public void onProviderEnabled(String provider) {
+		}
 
-    private GeoPoint GeopointFactory(double latitude, double longitude) {
-        int lat = (int) (latitude * 1E6);
-        int lng = (int) (longitude * 1E6);
-        return new GeoPoint(lat, lng);
-    }
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.layout.track_menu, menu);
-    }
-    
-    
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.video:
-                showVideo(info.id);
-                return true;
-            case R.id.stores:
-                showStores(info.id);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-    
-    public void showStores(long id)
-    {
-    	System.out.println("showStores:  Value of trackId == " + id);
-    }
-    public void showVideo(long id)
-    {
-    	System.out.println("showVideo:  Value of trackId == " + id);    	
-    }
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
+	}
+
+	private GeoPoint GeopointFactory(double latitude, double longitude) {
+		int lat = (int) (latitude * 1E6);
+		int lng = (int) (longitude * 1E6);
+		return new GeoPoint(lat, lng);
+	}
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.layout.track_menu, menu);
+	}
+
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		switch (item.getItemId()) {
+		case R.id.video:
+			showVideo(info.id);
+			return true;
+		case R.id.stores:
+			showStores(info.id);
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
+	}
+
+	public void showStores(long id)
+	{
+		System.out.println("showStores:  Value of trackId == " + id);
+	}
+	public void showVideo(long id)
+	{
+		System.out.println("showVideo:  Value of trackId == " + id);   
+
+		Intent intent = new Intent(MyMapActivity.this, AndroidListMediaActivity.class);
+        startActivity(intent);
+        /*
+		Intent intent = new Intent(Intent.ACTION_VIEW)
+		.setType("application/com.missionse.example")
+		.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+*/
+	}
 
 }
